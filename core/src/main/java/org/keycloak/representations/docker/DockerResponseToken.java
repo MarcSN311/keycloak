@@ -42,7 +42,7 @@ public class DockerResponseToken extends JsonWebToken {
     }
 
     @Override
-    public DockerResponseToken expiration(final int expiration) {
+    public DockerResponseToken expiration(final long expiration) {
         super.expiration(expiration);
         return this;
     }

@@ -195,7 +195,7 @@ public class AccessToken extends IDToken {
     }
 
     @Override
-    public AccessToken expiration(int expiration) {
+    public AccessToken expiration(long expiration) {
         return (AccessToken) super.expiration(expiration);
     }
 

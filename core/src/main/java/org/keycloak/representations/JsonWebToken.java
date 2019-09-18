@@ -42,7 +42,7 @@ public class JsonWebToken implements Serializable, Token {
     @JsonProperty("jti")
     protected String id;
     @JsonProperty("exp")
-    protected int expiration;
+    protected long expiration;
     @JsonProperty("nbf")
     protected int notBefore;
     @JsonProperty("iat")
@@ -71,11 +71,11 @@ public class JsonWebToken implements Serializable, Token {
     }
 
 
-    public int getExpiration() {
+    public long getExpiration() {
         return expiration;
     }
 
-    public JsonWebToken expiration(int expiration) {
+    public JsonWebToken expiration(long expiration) {
         this.expiration = expiration;
         return this;
     }
