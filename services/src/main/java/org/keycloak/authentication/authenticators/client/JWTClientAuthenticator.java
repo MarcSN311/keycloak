@@ -162,7 +162,7 @@ public class JWTClientAuthenticator extends AbstractClientAuthenticator {
             }
 
             SingleUseTokenStoreProvider singleUseCache = context.getSession().getProvider(SingleUseTokenStoreProvider.class);
-            int lifespanInSecs = Math.max(token.getExpiration() - currentTime, 10);
+            long lifespanInSecs = Math.max(token.getExpiration() - currentTime, 10);
             if (singleUseCache.putIfAbsent(token.getId(), lifespanInSecs)) {
                 logger.tracef("Added token '%s' to single-use cache. Lifespan: %d seconds, client: %s", token.getId(), lifespanInSecs, clientId);
 
