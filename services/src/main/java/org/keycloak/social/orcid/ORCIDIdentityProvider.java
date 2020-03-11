@@ -35,17 +35,17 @@ import javax.ws.rs.core.UriBuilder;
 /**
  * @author Marc Schulz-Narres
  */
-public class ORCIDIdentityProvider extends OIDCIdentityProvider implements SocialIdentityProvider<OIDCIdentityProviderConfig> {
+public class ORCIDIdentityProvider extends OIDCIdentityProvider implements SocialIdentityProvider<ORCIDIdentityProviderConfig> {
 
-    public static final String AUTH_URL = "https://sandbox.orcid.org/oauth/authorize";
-    public static final String TOKEN_URL = "https://sandbox.orcid.org/oauth/token";
-    public static final String PROFILE_URL = "https://sandbox.orcid.org/oauth/userinfo";
+    public static final String AUTH_URL = "https://orcid.org/oauth/authorize";
+    public static final String TOKEN_URL = "https://orcid.org/oauth/token";
+    public static final String PROFILE_URL = "https://orcid.org/oauth/userinfo";
     public static final String DEFAULT_SCOPE = "openid email /read-limited";
 
-    public ORCIDIdentityProvider(KeycloakSession session, OIDCIdentityProviderConfig config) {
+    public ORCIDIdentityProvider(KeycloakSession session, ORCIDIdentityProviderConfig config) {
         super(session, config);
-        config.setAuthorizationUrl(AUTH_URL);
-        config.setTokenUrl(TOKEN_URL);
-        config.setUserInfoUrl(PROFILE_URL);
+		config.setAuthorizationUrl(config.targetSandbox() ? "https://sandbox.orcid.org/oauth/authorize" : AUTH_URL);
+		config.setTokenUrl((config.targetSandbox() ? "https://sandbox.orcid.org/oauth/token" : BASE_URL) + TOKEN_RESOURCE);
+		config.setUserInfoUrl((config.targetSandbox() ? "https://sandbox.orcid.org/oauth/userinfo" : BASE_URL) + PROFILE_RESOURCE);
     }
 }
