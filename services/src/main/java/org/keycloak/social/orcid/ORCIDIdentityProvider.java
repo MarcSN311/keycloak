@@ -117,7 +117,9 @@ public class ORCIDIdentityProvider extends OIDCIdentityProvider implements Socia
 
                     String userEmailEndpointUrl = emailInfoUrl + "/" + identityNew.getId() + "/email";
                     JsonNode emailInfo = doApiCall(userEmailEndpointUrl, accessToken);
-                    logger.warn(emailInfo);
+                    
+                    email = emailInfo.at("/email/0/email").asText();
+                    identityNew.setEmail(email);
 
                     AbstractJsonUserAttributeMapper.storeUserProfileForMapper(identity, userInfo, getConfig().getAlias());
                 }
@@ -176,7 +178,7 @@ public class ORCIDIdentityProvider extends OIDCIdentityProvider implements Socia
                 throw new RuntimeException("Failed to verify signature of userinfo response from [" + url + "].");
             }
         } else {
-            throw new RuntimeException("Unsupported content-type [" + contentType + "] in response from [" + url + "]. Response: " + response.asString());
+            throw new RuntimeException("Unsupported content-type [" + contentType + "] in response from [" + url + "].");
         }
 
         return jsonData;
