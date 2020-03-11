@@ -146,7 +146,7 @@ public class ORCIDIdentityProvider extends OIDCIdentityProvider implements Socia
     }
 
     private JsonNode doApiCall(String url, String accessToken) throws IOException {
-        SimpleHttp.Response response = executeRequest(url, SimpleHttp.doGet(url, session).header("Authorization", "Bearer " + accessToken)).header("Accept", "application/json"));
+        SimpleHttp.Response response = executeRequest(url, SimpleHttp.doGet(url, session).header("Authorization", "Bearer " + accessToken).header("Accept", "application/json"));
         String contentType = response.getFirstHeader(HttpHeaders.CONTENT_TYPE);
         MediaType contentMediaType;
         try {
