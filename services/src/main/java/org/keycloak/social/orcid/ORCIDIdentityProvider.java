@@ -45,6 +45,7 @@ import org.keycloak.representations.JsonWebToken;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
@@ -54,6 +55,8 @@ import java.io.IOException;
  */
 public class ORCIDIdentityProvider extends OIDCIdentityProvider implements SocialIdentityProvider<ORCIDIdentityProviderConfig> {
     protected static final Logger logger = Logger.getLogger(ORCIDIdentityProvider.class);
+
+    private static final MediaType APPLICATION_JWT_TYPE = MediaType.valueOf("application/jwt");
 
     public static final String AUTH_URL = "https://orcid.org/oauth/authorize";
     public static final String TOKEN_URL = "https://orcid.org/oauth/token";
@@ -76,6 +79,22 @@ public class ORCIDIdentityProvider extends OIDCIdentityProvider implements Socia
 
     protected String getEmailUrl() {
         return getConfig().getEmailUrl();
+    }
+
+    private SimpleHttp.Response executeRequest(String url, SimpleHttp request) throws IOException {
+        SimpleHttp.Response response = request.asResponse();
+        if (response.getStatus() != 200) {
+            String msg = "failed to invoke url [" + url + "]";
+            try {
+                String tmp = response.asString();
+                if (tmp != null) msg = tmp;
+
+            } catch (IOException e) {
+
+            }
+            throw new IdentityBrokerException("Failed to invoke url [" + url + "]: " + msg);
+        }
+        return  response;
     }
 
     @Override
@@ -104,7 +123,7 @@ public class ORCIDIdentityProvider extends OIDCIdentityProvider implements Socia
             }
         }
 
-        if(identityNew){
+        if(identityNew != null){
             identity=identityNew;
         } else {
             identity.setId(id);
