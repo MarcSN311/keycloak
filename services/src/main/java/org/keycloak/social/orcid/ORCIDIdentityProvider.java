@@ -62,7 +62,7 @@ public class ORCIDIdentityProvider extends OIDCIdentityProvider implements Socia
     public static final String TOKEN_URL = "https://orcid.org/oauth/token";
     public static final String PROFILE_URL = "https://orcid.org/oauth/userinfo";
     public static final String EMAIL_URL = "https://api.orcid.org/v2.1";
-    public static final String DEFAULT_SCOPE = "openid email /read-limited";
+    public static final String DEFAULT_SCOPE = "openid /read-limited";
 
     public ORCIDIdentityProvider(KeycloakSession session, ORCIDIdentityProviderConfig config) {
         super(session, config);
