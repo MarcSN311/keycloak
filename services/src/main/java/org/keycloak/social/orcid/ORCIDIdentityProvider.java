@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.keycloak.social.google;
+package org.keycloak.social.orcid;
 
 import org.keycloak.OAuth2Constants;
 import org.keycloak.broker.oidc.OIDCIdentityProvider;
@@ -35,14 +35,14 @@ import javax.ws.rs.core.UriBuilder;
 /**
  * @author Marc Schulz-Narres
  */
-public class GoogleIdentityProvider extends OIDCIdentityProvider implements SocialIdentityProvider<OIDCIdentityProviderConfig> {
+public class ORCIDIdentityProvider extends OIDCIdentityProvider implements SocialIdentityProvider<OIDCIdentityProviderConfig> {
 
     public static final String AUTH_URL = "https://sandbox.orcid.org/oauth/authorize";
     public static final String TOKEN_URL = "https://sandbox.orcid.org/oauth/token";
     public static final String PROFILE_URL = "https://sandbox.orcid.org/oauth/userinfo";
     public static final String DEFAULT_SCOPE = "openid email /read-limited";
 
-    public GoogleIdentityProvider(KeycloakSession session, GoogleIdentityProviderConfig config) {
+    public ORCIDIdentityProvider(KeycloakSession session, ORCIDIdentityProviderConfig config) {
         super(session, config);
         config.setAuthorizationUrl(AUTH_URL);
         config.setTokenUrl(TOKEN_URL);
