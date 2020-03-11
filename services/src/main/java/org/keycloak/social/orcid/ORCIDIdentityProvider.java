@@ -71,6 +71,7 @@ public class ORCIDIdentityProvider extends OIDCIdentityProvider implements Socia
 		config.setUserInfoUrl(config.targetSandbox() ? "https://sandbox.orcid.org/oauth/userinfo" : PROFILE_URL);
         config.setEmailUrl(config.targetSandbox() ? "https://api.sandbox.orcid.org/v2.1" : EMAIL_URL);
         config.setDefaultScope(DEFAULT_SCOPE);
+        config.setPrompt("login");
     }
 
 	@Override
@@ -117,7 +118,7 @@ public class ORCIDIdentityProvider extends OIDCIdentityProvider implements Socia
 
                     String userEmailEndpointUrl = emailInfoUrl + "/" + identityNew.getId() + "/email";
                     JsonNode emailInfo = doApiCall(userEmailEndpointUrl, accessToken);
-                    
+
                     email = emailInfo.at("/email/0/email").asText();
                     identityNew.setEmail(email);
 
