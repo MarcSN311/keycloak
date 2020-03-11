@@ -14,17 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.keycloak.social.paypal;
+package org.keycloak.social.orcid;
 
 import org.keycloak.broker.oidc.OAuth2IdentityProviderConfig;
 import org.keycloak.models.IdentityProviderModel;
 
 /**
- * @author Petter Lysne (petterlysne at hotmail dot com)
+ * @author Marc Schulz-Narres
  */
-public class PayPalIdentityProviderConfig extends OAuth2IdentityProviderConfig {
+public class ORCIDIdentityProviderConfig extends OIDCIdentityProviderConfig {
 
-    public PayPalIdentityProviderConfig(IdentityProviderModel model) {
+    public ORCIDIdentityProviderConfig(IdentityProviderModel model) {
         super(model);
     }
 
