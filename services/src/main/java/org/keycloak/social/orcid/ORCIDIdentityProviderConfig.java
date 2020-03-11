@@ -38,7 +38,7 @@ public class ORCIDIdentityProviderConfig extends OIDCIdentityProviderConfig {
     }
 
     public String getEmailUrl() {
-        return getConfig().get("emailurl");;
+        return getConfig().get("emailurl");
     }
 
     public void setEmailUrl(String emailurl) {
