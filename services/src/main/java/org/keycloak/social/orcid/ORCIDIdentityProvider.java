@@ -48,4 +48,48 @@ public class ORCIDIdentityProvider extends OIDCIdentityProvider implements Socia
 		config.setTokenUrl((config.targetSandbox() ? "https://sandbox.orcid.org/oauth/token" : BASE_URL) + TOKEN_RESOURCE);
 		config.setUserInfoUrl((config.targetSandbox() ? "https://sandbox.orcid.org/oauth/userinfo" : BASE_URL) + PROFILE_RESOURCE);
     }
+
+	@Override
+	protected String getDefaultScopes() {
+		return DEFAULT_SCOPE;
+	}
+/*
+    @Override
+    protected BrokeredIdentityContext extractIdentity(AccessTokenResponse tokenResponse, String accessToken, JsonWebToken idToken) throws IOException {
+
+    }
+
+    private BrokeredIdentityContext ORCIDextractIdentity(JsonNode profile) {
+
+    }
+*/
+    @Override
+	protected BrokeredIdentityContext extractIdentityFromProfile(EventBuilder event, JsonNode profile) {
+		String id = getJsonProperty(profile, "id");
+		if (id == null) {
+			event.detail(Details.REASON, "id claim is null from user info json");
+			event.error(Errors.INVALID_TOKEN);
+			throw new ErrorResponseException(OAuthErrorException.INVALID_TOKEN, "invalid token", Response.Status.BAD_REQUEST);
+		}
+		return ORCIDExtractFromProfile(profile);
+	}
+
+	private BrokeredIdentityContext ORCIDextractIdentityFromProfile(JsonNode profile) {
+		String id = getJsonProperty(profile, "id");
+
+		BrokeredIdentityContext identity = new BrokeredIdentityContext(id);
+
+		String given_name = getJsonProperty(profile, "given_name");
+		String family_name = getJsonProperty(profile, "family_name");
+
+		AbstractJsonUserAttributeMapper.storeUserProfileForMapper(identity, profile, getConfig().getAlias());
+
+		identity.setId(id);
+		identity.setFirstName(given_name);
+        identity.setLastName(family_name);
+		identity.setBrokerUserId(getConfig().getAlias() + "." + id);
+		identity.setUsername(id);
+
+		return identity;
+	}
 }
