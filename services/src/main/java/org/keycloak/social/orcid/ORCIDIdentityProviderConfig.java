@@ -37,4 +37,12 @@ public class ORCIDIdentityProviderConfig extends OIDCIdentityProviderConfig {
         getConfig().put("sandbox", String.valueOf(sandbox));
     }
 
+    public String getEmailUrl() {
+        return getConfig().get("emailurl");;
+    }
+
+    public void setEmailUrl(String emailurl) {
+        getConfig().put("emailurl", String.valueOf(emailurl));
+    }
+
 }

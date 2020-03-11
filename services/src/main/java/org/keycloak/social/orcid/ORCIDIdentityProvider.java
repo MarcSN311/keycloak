@@ -16,6 +16,7 @@
  */
 package org.keycloak.social.orcid;
 
+import org.jboss.logging.Logger;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.OAuth2Constants;
@@ -33,22 +34,26 @@ import org.keycloak.representations.JsonWebToken;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
+import java.io.IOException;
 
 /**
  * @author Marc Schulz-Narres
  */
 public class ORCIDIdentityProvider extends OIDCIdentityProvider implements SocialIdentityProvider<ORCIDIdentityProviderConfig> {
+    protected static final Logger logger = Logger.getLogger(ORCIDIdentityProvider.class);
 
     public static final String AUTH_URL = "https://orcid.org/oauth/authorize";
     public static final String TOKEN_URL = "https://orcid.org/oauth/token";
     public static final String PROFILE_URL = "https://orcid.org/oauth/userinfo";
+    public static final String EMAIL_URL = "https://api.orcid.org/v2.1";
     public static final String DEFAULT_SCOPE = "openid email /read-limited";
 
     public ORCIDIdentityProvider(KeycloakSession session, ORCIDIdentityProviderConfig config) {
         super(session, config);
 		config.setAuthorizationUrl(config.targetSandbox() ? "https://sandbox.orcid.org/oauth/authorize" : AUTH_URL);
-		config.setTokenUrl((config.targetSandbox() ? "https://sandbox.orcid.org/oauth/token" : BASE_URL) + TOKEN_RESOURCE);
-		config.setUserInfoUrl((config.targetSandbox() ? "https://sandbox.orcid.org/oauth/userinfo" : BASE_URL) + PROFILE_RESOURCE);
+		config.setTokenUrl(config.targetSandbox() ? "https://sandbox.orcid.org/oauth/token" : TOKEN_URL);
+		config.setUserInfoUrl(config.targetSandbox() ? "https://sandbox.orcid.org/oauth/userinfo" : TOKEN_URL);
+        config.setEmailUrl(config.targetSandbox() ? "https://api.sandbox.orcid.org/v2.1" : EMAIL_URL);
     }
 
 	@Override
@@ -71,6 +76,11 @@ public class ORCIDIdentityProvider extends OIDCIdentityProvider implements Socia
                 if (accessToken != null) {
                     JsonNode userInfo = doApiCall(userInfoUrl, accessToken);
                     identityNew=ORCIDextractIdentity(userInfo);
+
+                    String userEmailEndpointUrl = EMAIL_URL + "/" + identityNew.getId() + "/email";
+                    JsonNode emailInfo = doApiCall(userEmailEndpointUrl, accessToken);
+                    logger.warn(emailInfo);
+
                     AbstractJsonUserAttributeMapper.storeUserProfileForMapper(identity, userInfo, getConfig().getAlias());
                 }
             }
