@@ -53,16 +53,85 @@ public class ORCIDIdentityProvider extends OIDCIdentityProvider implements Socia
 	protected String getDefaultScopes() {
 		return DEFAULT_SCOPE;
 	}
-/*
+
     @Override
     protected BrokeredIdentityContext extractIdentity(AccessTokenResponse tokenResponse, String accessToken, JsonWebToken idToken) throws IOException {
+        String id = idToken.getSubject();
+        BrokeredIdentityContext identity = new BrokeredIdentityContext(id);
+        BrokeredIdentityContext identityNew;
+        String name = (String) idToken.getOtherClaims().get(IDToken.NAME);
+        String preferredUsername = (String) idToken.getOtherClaims().get(getusernameClaimNameForIdToken());
+        String email = (String) idToken.getOtherClaims().get(IDToken.EMAIL);
 
+        if (!getConfig().isDisableUserInfoService()) {
+            String userInfoUrl = getUserInfoUrl();
+            if (userInfoUrl != null && !userInfoUrl.isEmpty() && (id == null || name == null || preferredUsername == null || email == null)) {
+                if (accessToken != null) {
+                    JsonNode userInfo = doApiCall(userInfoUrl, accessToken);
+                    identityNew=ORCIDextractIdentity(userInfo);
+                    AbstractJsonUserAttributeMapper.storeUserProfileForMapper(identity, userInfo, getConfig().getAlias());
+                }
+            }
+        }
+
+        if(identityNew){
+            identity=identityNew;
+        } else {
+            identity.setId(id);
+            identity.setName(name);
+            identity.setEmail(email);
+            identity.setBrokerUserId(getConfig().getAlias() + "." + id);
+            identity.setUsername(id);
+        }
+
+        identity.getContextData().put(VALIDATED_ID_TOKEN, idToken);
+
+        if (tokenResponse != null && tokenResponse.getSessionState() != null) {
+            identity.setBrokerSessionId(getConfig().getAlias() + "." + tokenResponse.getSessionState());
+        }
+        if (tokenResponse != null) identity.getContextData().put(FEDERATED_ACCESS_TOKEN_RESPONSE, tokenResponse);
+        if (tokenResponse != null) processAccessTokenResponse(identity, tokenResponse);
+        
+        return identity;
     }
 
-    private BrokeredIdentityContext ORCIDextractIdentity(JsonNode profile) {
+    private JsonNode doApiCall(String url, String accessToken) {
+        SimpleHttp.Response response = executeRequest(url, SimpleHttp.doGet(url, session).header("Authorization", "Bearer " + accessToken));
+        String contentType = response.getFirstHeader(HttpHeaders.CONTENT_TYPE);
+        MediaType contentMediaType;
+        try {
+            contentMediaType = MediaType.valueOf(contentType);
+        } catch (IllegalArgumentException ex) {
+            contentMediaType = null;
+        }
+        if (contentMediaType == null || contentMediaType.isWildcardSubtype() || contentMediaType.isWildcardType()) {
+            throw new RuntimeException("Unsupported content-type [" + contentType + "] in response from [" + url + "].");
+        }
+        JsonNode jsonData;
 
+        if (MediaType.APPLICATION_JSON_TYPE.isCompatible(contentMediaType)) {
+            jsonData = response.asJson();
+        } else if (APPLICATION_JWT_TYPE.isCompatible(contentMediaType)) {
+            JWSInput jwsInput;
+
+            try {
+                jwsInput = new JWSInput(response.asString());
+            } catch (JWSInputException cause) {
+                throw new RuntimeException("Failed to parse JWT userinfo response", cause);
+            }
+
+            if (verify(jwsInput)) {
+                jsonData = JsonSerialization.readValue(jwsInput.getContent(), JsonNode.class);
+            } else {
+                throw new RuntimeException("Failed to verify signature of userinfo response from [" + url + "].");
+            }
+        } else {
+            throw new RuntimeException("Unsupported content-type [" + contentType + "] in response from [" + url + "].");
+        }
+
+        return jsonData;
     }
-*/
+
     @Override
 	protected BrokeredIdentityContext extractIdentityFromProfile(EventBuilder event, JsonNode profile) {
 		String id = getJsonProperty(profile, "id");
@@ -71,10 +140,10 @@ public class ORCIDIdentityProvider extends OIDCIdentityProvider implements Socia
 			event.error(Errors.INVALID_TOKEN);
 			throw new ErrorResponseException(OAuthErrorException.INVALID_TOKEN, "invalid token", Response.Status.BAD_REQUEST);
 		}
-		return ORCIDExtractFromProfile(profile);
+		return ORCIDExtract(profile);
 	}
 
-	private BrokeredIdentityContext ORCIDextractIdentityFromProfile(JsonNode profile) {
+	private BrokeredIdentityContext ORCIDextractIdentity(JsonNode profile) {
 		String id = getJsonProperty(profile, "id");
 
 		BrokeredIdentityContext identity = new BrokeredIdentityContext(id);

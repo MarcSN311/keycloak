@@ -16,7 +16,7 @@
  */
 package org.keycloak.social.orcid;
 
-import org.keycloak.broker.oidc.OAuth2IdentityProviderConfig;
+import org.keycloak.broker.oidc.OIDCIdentityProviderConfig;
 import org.keycloak.models.IdentityProviderModel;
 
 /**
