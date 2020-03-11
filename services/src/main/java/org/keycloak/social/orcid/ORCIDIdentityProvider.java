@@ -16,6 +16,8 @@
  */
 package org.keycloak.social.orcid;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.broker.oidc.OIDCIdentityProvider;
 import org.keycloak.broker.oidc.OIDCIdentityProviderConfig;
