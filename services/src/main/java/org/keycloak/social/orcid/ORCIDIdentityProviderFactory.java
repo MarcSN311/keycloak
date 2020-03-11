@@ -36,7 +36,7 @@ public class ORCIDIdentityProviderFactory extends AbstractIdentityProviderFactor
 
     @Override
     public ORCIDIdentityProvider create(KeycloakSession session, IdentityProviderModel model) {
-        return new ORCIDIdentityProvider(session, new ORCIDIdentityProviderConfig(model));
+        return new ORCIDIdentityProvider(session, new OIDCIdentityProviderConfig(model));
     }
 
     @Override
