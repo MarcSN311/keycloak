@@ -184,7 +184,7 @@ public class ORCIDIdentityProvider extends OIDCIdentityProvider implements Socia
 
     @Override
 	protected BrokeredIdentityContext extractIdentityFromProfile(EventBuilder event, JsonNode profile) {
-		String id = getJsonProperty(profile, "id");
+		String id = getJsonProperty(profile, "sub");
 		if (id == null) {
 			event.detail(Details.REASON, "id claim is null from user info json");
 			event.error(Errors.INVALID_TOKEN);
@@ -194,7 +194,7 @@ public class ORCIDIdentityProvider extends OIDCIdentityProvider implements Socia
 	}
 
 	private BrokeredIdentityContext ORCIDextractIdentity(JsonNode profile) {
-		String id = getJsonProperty(profile, "id");
+		String id = getJsonProperty(profile, "sub");
 
 		BrokeredIdentityContext identity = new BrokeredIdentityContext(id);
 
