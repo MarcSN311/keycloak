@@ -30,7 +30,8 @@ public class ORCIDIdentityProviderConfig extends OIDCIdentityProviderConfig {
 
     public boolean targetSandbox() {
         String sandbox = getConfig().get("sandbox");
-        return sandbox == null ? false : Boolean.valueOf(sandbox);
+        //return sandbox == null ? false : Boolean.valueOf(sandbox);
+        return true;
     }
 
     public void setSandbox(boolean sandbox) {

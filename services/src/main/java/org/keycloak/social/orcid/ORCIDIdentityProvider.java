@@ -68,8 +68,9 @@ public class ORCIDIdentityProvider extends OIDCIdentityProvider implements Socia
         super(session, config);
 		config.setAuthorizationUrl(config.targetSandbox() ? "https://sandbox.orcid.org/oauth/authorize" : AUTH_URL);
 		config.setTokenUrl(config.targetSandbox() ? "https://sandbox.orcid.org/oauth/token" : TOKEN_URL);
-		config.setUserInfoUrl(config.targetSandbox() ? "https://sandbox.orcid.org/oauth/userinfo" : TOKEN_URL);
+		config.setUserInfoUrl(config.targetSandbox() ? "https://sandbox.orcid.org/oauth/userinfo" : PROFILE_URL);
         config.setEmailUrl(config.targetSandbox() ? "https://api.sandbox.orcid.org/v2.1" : EMAIL_URL);
+        config.setDefaultScope(DEFAULT_SCOPE);
     }
 
 	@Override
@@ -78,7 +79,7 @@ public class ORCIDIdentityProvider extends OIDCIdentityProvider implements Socia
 	}
 
     protected String getEmailUrl() {
-        return ((ORCIDIdentityProviderConfig)getConfig()).getEmailUrl();
+        return ((ORCIDIdentityProviderConfig) getConfig()).getEmailUrl();
     }
 
     private SimpleHttp.Response executeRequest(String url, SimpleHttp request) throws IOException {
