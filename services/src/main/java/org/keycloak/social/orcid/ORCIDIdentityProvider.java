@@ -53,7 +53,7 @@ import java.io.IOException;
 /**
  * @author Marc Schulz-Narres
  */
-public class ORCIDIdentityProvider extends OIDCIdentityProvider implements SocialIdentityProvider<ORCIDIdentityProviderConfig> {
+public class ORCIDIdentityProvider extends OIDCIdentityProvider implements SocialIdentityProvider<OIDCIdentityProviderConfig> {
     protected static final Logger logger = Logger.getLogger(ORCIDIdentityProvider.class);
 
     private static final MediaType APPLICATION_JWT_TYPE = MediaType.valueOf("application/jwt");
@@ -78,7 +78,7 @@ public class ORCIDIdentityProvider extends OIDCIdentityProvider implements Socia
 	}
 
     protected String getEmailUrl() {
-        return getConfig().getEmailUrl();
+        return ((ORCIDIdentityProviderConfig)getConfig()).getEmailUrl();
     }
 
     private SimpleHttp.Response executeRequest(String url, SimpleHttp request) throws IOException {
