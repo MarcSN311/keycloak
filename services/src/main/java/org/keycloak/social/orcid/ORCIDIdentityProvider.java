@@ -101,7 +101,7 @@ public class ORCIDIdentityProvider extends OIDCIdentityProvider implements Socia
     protected BrokeredIdentityContext extractIdentity(AccessTokenResponse tokenResponse, String accessToken, JsonWebToken idToken) throws IOException {
         String id = idToken.getSubject();
         BrokeredIdentityContext identity = new BrokeredIdentityContext(id);
-        BrokeredIdentityContext identityNew;
+        BrokeredIdentityContext identityNew = null;
         String name = (String) idToken.getOtherClaims().get(IDToken.NAME);
         String preferredUsername = (String) idToken.getOtherClaims().get(getusernameClaimNameForIdToken());
         String email = (String) idToken.getOtherClaims().get(IDToken.EMAIL);
@@ -144,7 +144,7 @@ public class ORCIDIdentityProvider extends OIDCIdentityProvider implements Socia
         return identity;
     }
 
-    private JsonNode doApiCall(String url, String accessToken) {
+    private JsonNode doApiCall(String url, String accessToken) throws IOException {
         SimpleHttp.Response response = executeRequest(url, SimpleHttp.doGet(url, session).header("Authorization", "Bearer " + accessToken));
         String contentType = response.getFirstHeader(HttpHeaders.CONTENT_TYPE);
         MediaType contentMediaType;
