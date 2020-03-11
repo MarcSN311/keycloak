@@ -18,8 +18,17 @@ package org.keycloak.social.orcid;
 
 import org.jboss.logging.Logger;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.keycloak.jose.jws.JWSInput;
+import org.keycloak.jose.jws.JWSInputException;
+import org.keycloak.broker.provider.util.SimpleHttp;
+import org.keycloak.broker.oidc.mappers.AbstractJsonUserAttributeMapper;
 import org.keycloak.representations.AccessTokenResponse;
+import org.keycloak.representations.IDToken;
+import org.keycloak.representations.JsonWebToken;
+import org.keycloak.events.Details;
+import org.keycloak.events.Errors;
 import org.keycloak.OAuth2Constants;
+import org.keycloak.OAuthErrorException;
 import org.keycloak.broker.oidc.OIDCIdentityProvider;
 import org.keycloak.broker.oidc.OIDCIdentityProviderConfig;
 import org.keycloak.broker.provider.AuthenticationRequest;
@@ -30,8 +39,12 @@ import org.keycloak.common.ClientConnection;
 import org.keycloak.common.util.KeycloakUriBuilder;
 import org.keycloak.events.EventBuilder;
 import org.keycloak.models.KeycloakSession;
+import org.keycloak.util.JsonSerialization;
+import org.keycloak.services.ErrorResponseException;
 import org.keycloak.representations.JsonWebToken;
 
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
@@ -72,12 +85,13 @@ public class ORCIDIdentityProvider extends OIDCIdentityProvider implements Socia
 
         if (!getConfig().isDisableUserInfoService()) {
             String userInfoUrl = getUserInfoUrl();
-            if (userInfoUrl != null && !userInfoUrl.isEmpty() && (id == null || name == null || preferredUsername == null || email == null)) {
+            String emailInfoUrl = getEmailUrl();
+            if (userInfoUrl != null && !userInfoUrl.isEmpty() && emailInfoUrl != null && !emailInfoUrl.isEmpty() && (id == null || name == null || preferredUsername == null || email == null)) {
                 if (accessToken != null) {
                     JsonNode userInfo = doApiCall(userInfoUrl, accessToken);
                     identityNew=ORCIDextractIdentity(userInfo);
 
-                    String userEmailEndpointUrl = EMAIL_URL + "/" + identityNew.getId() + "/email";
+                    String userEmailEndpointUrl = emailInfoUrl + "/" + identityNew.getId() + "/email";
                     JsonNode emailInfo = doApiCall(userEmailEndpointUrl, accessToken);
                     logger.warn(emailInfo);
 
@@ -152,7 +166,7 @@ public class ORCIDIdentityProvider extends OIDCIdentityProvider implements Socia
 			event.error(Errors.INVALID_TOKEN);
 			throw new ErrorResponseException(OAuthErrorException.INVALID_TOKEN, "invalid token", Response.Status.BAD_REQUEST);
 		}
-		return ORCIDExtract(profile);
+		return ORCIDextractIdentity(profile);
 	}
 
 	private BrokeredIdentityContext ORCIDextractIdentity(JsonNode profile) {
