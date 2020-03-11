@@ -74,6 +74,10 @@ public class ORCIDIdentityProvider extends OIDCIdentityProvider implements Socia
 		return DEFAULT_SCOPE;
 	}
 
+    protected String getEmailUrl() {
+        return getConfig().getEmailUrl();
+    }
+
     @Override
     protected BrokeredIdentityContext extractIdentity(AccessTokenResponse tokenResponse, String accessToken, JsonWebToken idToken) throws IOException {
         String id = idToken.getSubject();
